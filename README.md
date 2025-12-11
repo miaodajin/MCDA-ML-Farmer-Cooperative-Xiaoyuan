@@ -60,37 +60,48 @@ pip install pandas numpy scikit-learn matplotlib scipy
 ### Step-by-Step Execution
 
 **Step 1: Merge Raw Data**
+
 ```bash
 cd code
 python merge_raw.py
 ```
+
 This script merges multiple household survey files (hh_3.csv through hh_20.csv) into a single `raw_df.csv` file using the household identifier `varID` as the merge key.
 
 **Step 2: Build Clustering Features**
+
 ```bash
 python build_cluster_df.py
 ```
+
 This script:
+
 - Cleans and preprocesses variables (handling missing values, encoding categorical variables)
 - Creates clustering features including land area, mechanization, fertilizer use, digital literacy, financial access, and health/environmental behaviors
 - Applies winsorization (1%-99%) to continuous variables to handle outliers
 - Outputs `cluster_df.csv`
 
 **Step 3: Run K-means Clustering**
+
 ```bash
 python run_kmeans.py
 ```
+
 This script:
+
 - Standardizes continuous features using Z-score normalization
 - Evaluates K values from 2-8 using inertia (elbow method) and silhouette scores
 - Performs K-means clustering with K=3 (optimal value based on evaluation)
 - Outputs cluster labels and evaluation results
 
 **Step 4: Analyze Clusters**
+
 ```bash
 python analyze_clusters.py
 ```
+
 This script:
+
 - Calculates three MCDA indices:
   - **CMI (Capacity and Modernization Index)**: Land resources, mechanization, irrigation, digital capability, financial access
   - **GSPI (Green and Sustainable Production Index)**: Fertilizer practices, waste management, straw utilization
@@ -102,39 +113,43 @@ This script:
 ## Key Variables
 
 ### Clustering Features
-| Variable | Description | Type |
-|----------|-------------|------|
-| land_area | Total cultivated land (mu) | Continuous |
-| tillage_mech_ratio | Proportion of mechanized tillage | Continuous |
-| irrigated_area_ratio | Proportion of irrigated land | Continuous |
-| chem_fert_kg_per_mu | Chemical fertilizer per mu (kg) | Continuous |
-| organic_fert_total | Total organic fertilizer use | Continuous |
-| mobile_hours_per_day | Daily smartphone usage (hours) | Continuous |
-| can_get_info_online | Online information access ability | Binary |
-| internet_training | Received internet training | Binary |
-| e_commerce | Uses e-commerce | Binary |
-| ag_insurance | Has agricultural insurance | Binary |
-| bank_credit_user | Uses bank credit | Binary |
-| applied_bank_loan | Applied for bank loan | Binary |
-| trade_credit | Uses trade credit | Binary |
-| safe_drinking_water | Has safe drinking water | Binary |
-| garbage_sorting | Practices waste sorting | Binary |
-| sanitary_toilet | Has sanitary toilet | Binary |
-| health_knowledge_learning | Learns health knowledge | Binary |
-| has_checkup | Had health checkup | Binary |
-| straw_utilized | Utilizes crop straw | Binary |
-| pesticide_pack_safe | Safe pesticide packaging disposal | Binary |
 
-### Outcome Variables
-| Variable | Source | Description |
-|----------|--------|-------------|
-| var5_1 | hh_5 | Cooperative membership status |
-| var17_32_1 | hh_17 | Household income |
-| var11_1-4 | hh_11 | Life satisfaction scores |
+| Variable                  | Description                               | Type       | MCDA Index |
+| ------------------------- | ----------------------------------------- | ---------- | ---------- |
+| land_area                 | Total cultivated land (mu)                | Continuous | CMI        |
+| tillage_mech_ratio        | Proportion of mechanized tillage          | Continuous | CMI        |
+| irrigated_area_ratio      | Proportion of irrigated land              | Continuous | CMI        |
+| mobile_hours_per_day      | Daily smartphone usage (hours)            | Continuous | CMI        |
+| can_get_info_online       | Online information access ability         | Binary     | CMI        |
+| internet_training         | Received internet training                | Binary     | CMI        |
+| e_commerce                | Uses e-commerce                           | Binary     | CMI        |
+| ag_insurance              | Has agricultural insurance                | Binary     | CMI        |
+| bank_credit_user          | Uses bank credit                          | Binary     | CMI        |
+| applied_bank_loan         | Applied for bank loan                     | Binary     | CMI        |
+| trade_credit              | Uses trade credit                         | Binary     | CMI        |
+| chem_fert_kg_per_mu       | Chemical fertilizer per mu (kg, reversed) | Continuous | GSPI       |
+| organic_fert_total        | Total organic fertilizer use              | Continuous | GSPI       |
+| straw_utilized            | Utilizes crop straw                       | Binary     | GSPI       |
+| pesticide_pack_safe       | Safe pesticide packaging disposal         | Binary     | GSPI       |
+| garbage_sorting           | Practices waste sorting                   | Binary     | GSPI       |
+| garbage_central_treatment | Uses centralized garbage treatment        | Binary     | GSPI       |
+| sanitary_toilet           | Has sanitary toilet                       | Binary     | HLEI       |
+| health_knowledge_learning | Learns health knowledge                   | Binary     | HLEI       |
+| has_checkup               | Had health checkup                        | Binary     | HLEI       |
+
+### MCDA Index Composition
+
+| Index             | Full Name                              | Components                                                                                                                                                                                     |
+| ----------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **CMI**     | Capacity and Modernization Index       | land_area, tillage_mech_ratio, irrigated_area_ratio, mobile_hours_per_day, can_get_info_online, internet_training, e_commerce, ag_insurance, bank_credit_user, applied_bank_loan, trade_credit |
+| **GSPI**    | Green and Sustainable Production Index | chem_fert_kg_per_mu (reversed), organic_fert_total, straw_utilized, pesticide_pack_safe, garbage_sorting, garbage_central_treatment                                                            |
+| **HLEI**    | Health and Living Environment Index    | safe_drinking_water, sanitary_toilet, health_knowledge_learning, has_checkup                                                                                                                   |
+| **Overall** | Overall Sustainability Index           | Mean of CMI, GSPI, and HLEI                                                                                                                                                                    |
 
 ## Results Summary
 
 The analysis identifies three distinct household clusters:
+
 - **Cluster 1 (N≈994)**: Lower-capacity households with limited resources
 - **Cluster 2 (N≈2113)**: Moderate-capacity households
 - **Cluster 3 (N≈627)**: High-capacity households with advanced practices
@@ -148,4 +163,3 @@ For questions about this analysis, please refer to the associated paper or conta
 ## License
 
 This code is provided for academic replication purposes. The CRRS data is subject to the data use agreement with the Chinese Academy of Social Sciences.
-
